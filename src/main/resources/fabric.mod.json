@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "ZjFbSrvUtils",
+  "version": "${version}",
+  "name": "ZjServerUtils",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/zhangjing-GitHub-Code/ZjFbSrvUtilsootBeamsFPT"
+  },
+  "license": "AGPL-3.0",
+  "icon": "assets/ZjFbSrvUtils/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "client": [
+      "cn.jing2hang.zjfbsrvutils.client.ZjServerUtilsClient"
+    ],
+    "main": [
+      "cn.jing2hang.zjfbsrvutils.ZjServerUtils"
+    ]
+  },
+  "mixins": [
+    "ZjFbSrvUtils.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric": "*",
+    "minecraft": "1.20.1"
+  }
+}
