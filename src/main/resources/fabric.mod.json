@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "ZjFbSrvUtils",
+  "id": "zj_srv_utils",
   "version": "${version}",
   "name": "ZjServerUtils",
   "description": "",
@@ -9,7 +9,7 @@
     "repo": "https://github.com/zhangjing-GitHub-Code/ZjFbSrvUtilsootBeamsFPT"
   },
   "license": "AGPL-3.0",
-  "icon": "assets/ZjFbSrvUtils/icon.png",
+  "icon": "assets/icon.png",
   "environment": "server",
   "entrypoints": {
     "client": [
