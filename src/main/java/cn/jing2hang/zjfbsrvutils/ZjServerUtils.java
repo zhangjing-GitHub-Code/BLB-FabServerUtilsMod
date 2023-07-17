@@ -7,6 +7,8 @@ import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -49,54 +51,28 @@ import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.server.command.CommandManager.argument;
 // Import everything in the CommandManager
 import static net.minecraft.server.command.CommandManager.*;
-//import static net.minecraft.server.command.CommandManager.*;
 public class ZjServerUtils implements ModInitializer {
-    public static HashMap<String,allpos>TspcPos;
-    public static HashMap<String,String>CCmdMap;
+    LuckPerms lpapi;
+    public static HashMap<String,allpos>TspcPos; // Temp spectator Original Position
+    public static HashMap<String,String>CCmdMap; // Custom Command Maps
     Style REDWARN,INFO,HELP;
     private final String opHelpStr="  ! TIP: command is with no prefix '/'\n  > /qed save      -- Trigger save maps to file.\n  > /qed loadconf -- Load and overwrite current aliases.\n  > /qed add <alias> <command: -- Add alias -> command.\n  > /qed set <alias> <command: -- Re set the alias to command.\n  > /qed rm <alias> -- Remove the alias.";
     @Override
     public void onInitialize() {
-        REDWARN=Style.EMPTY.withColor(TextColor.parse("red"));//Style(TextColor.parse("red"),false,false,false,false,false,null,null,"",Style.DEFAULT_FONT_ID);
+        lpapi= LuckPermsProvider.get();
+        REDWARN=Style.EMPTY.withColor(TextColor.parse("red"));
         INFO=Style.EMPTY.withColor(0x66ccff);
         HELP=Style.EMPTY.withColor(0x666666);
         //REDWARN.color
         TspcPos=new HashMap<String,allpos>();
         CCmdMap=ConfigUtil.LoadConf();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("where")
-        //.then(argument("playerName",StringArgumentType.greedyString()))
         .then(argument("target", EntityArgumentType.player())
         .executes((context -> {
-            //if(context.getSource()==p)
-            /*final PlayerEntity src=context.getSource().getPlayer();
-            Vec3d spos=src.getPos();*/
-            //Text tgp=new Text();
-            //String tgPlayerName=tgp.togStrin();
             PlayerEntity targ=EntityArgumentType.getPlayer(context,"target");
-            /*String TGPlayerName=null; // PLH
-            TGPlayerName=StringArgumentType.getString(context,"playerName");
-            MinecraftServer mcs=context.getSource().getServer();
-            PlayerManager pm= mcs.getPlayerManager();
-            /*Set<RegistryKey<World>> rkeys=mcs.getWorldRegistryKeys();
-            for(RegistryKey<World> rkey:rkeys){
-                mcs.getWorlds()
-            }*\/
-            //for(ServerWorld wl:mcs.getWorlds()){
-                for(ServerPlayerEntity ply_ent:pm.getPlayerList()){
-                    if(ply_ent.getName().toString().equals(TGPlayerName)){
-                        // FOUND same name
-                        Vec3d tpos=ply_ent.getPos();*/
             Vec3d tpos=targ.getPos();
-                        //context.getSource().sendFeedback(Text.s("找到玩家"),false);
             context.getSource().sendMessage(Text.literal("FOUND PLAYER AT: "+(int)tpos.x+","+(int)tpos.y+","+(int)tpos.z).setStyle(INFO));
             return 1;
-                        /*
-                    }
-                }*/
-            //}
-            //context.getSource().sendMessage(literal("玩家调用/whereami，你的位置是"+spos.x+","+spos.y+","+spos.z));
-            //context.getSource().sendMessage(Text.literal("PLAYER with given name not found."));
-            //return -1;
         })))
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("p")
@@ -121,6 +97,7 @@ public class ZjServerUtils implements ModInitializer {
                     pl.sendMessage(Text.literal("Entering temporary SPECTATOR mode.").setStyle(INFO));
                     return 1;
                 }))));
+        //
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("s")
                 .executes((ctx->{
                     ServerPlayerEntity pl=ctx.getSource().getPlayer();
@@ -131,7 +108,6 @@ public class ZjServerUtils implements ModInitializer {
                         return -1;
                     }
                     allpos p=TspcPos.get(pl.getUuidAsString());
-                    //pl.setPosition(orig);
                     pl.teleport(pl.getServerWorld(),p.x,p.y,p.z,p.yaw,p.pitch);
                     pl.sendMessage(Text.literal("Teleported back to ("+(int)p.x+","+(int)p.y+","+(int)p.z+")").setStyle(INFO));
                     TspcPos.remove(pl.getUuidAsString());
@@ -157,18 +133,10 @@ public class ZjServerUtils implements ModInitializer {
                 )
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("qed")
-                .then(literal("add").requires(src->src.hasPermissionLevel(4))
+                .then(literal("add")//.requires(src->src.hasPermissionLevel(4))
                     .then(argument("alias",StringArgumentType.string())
                     .then(argument("command",StringArgumentType.greedyString())
                         .executes((ctx->{
-                            //ServerPlayerEntity pl=ctx.getSource().getPlayer();
-                            ///
-                            //assert pl != null;
-                            //if(!CCmdMap.containsKey(ctx.getCommand().toString())){
-                                //pl.sendMessage(Text.literal("The quick command has not set!"));
-                                //return -1;
-                            //}
-                            //pl.getServer().getCommandManager().execute(ctx.getSource(),"");
                             ServerCommandSource src=ctx.getSource();
                             String alias=StringArgumentType.getString(ctx,"alias");
                             String cmd=StringArgumentType.getString(ctx,"command");
@@ -181,7 +149,7 @@ public class ZjServerUtils implements ModInitializer {
                             return 1;
                         }))
                     ))
-                ).then(literal("set").requires(src->src.hasPermissionLevel(4))
+                ).then(literal("set")//.requires(src->src.hasPermissionLevel(4))
                         .then(argument("alias",StringArgumentType.string())
                                 .then(argument("command",StringArgumentType.greedyString())
                                         .executes((ctx->{
@@ -197,7 +165,7 @@ public class ZjServerUtils implements ModInitializer {
                                             return 1;
                                         }))
                                 ))
-                ).then(literal("rm").requires(src->src.hasPermissionLevel(4))
+                ).then(literal("rm")//.requires(src->src.hasPermissionLevel(4))
                         .then(argument("alias",StringArgumentType.string())
                                     .executes((ctx->{
                                         ServerCommandSource src=ctx.getSource();
@@ -219,13 +187,13 @@ public class ZjServerUtils implements ModInitializer {
                         }
                         return 1;
                     }))
-                ).then(literal("save").requires(src-> src.hasPermissionLevel(3))
+                ).then(literal("save")//.requires(src-> src.hasPermissionLevel(3))
                         .executes((ctx->{
                             ctx.getSource().sendMessage(Text.literal("Saving Command maps to json...").setStyle(INFO));
                             ConfigUtil.writeConf(CCmdMap);
                             return 1;
                         }))
-                ).then(literal("loadconf").requires(src-> src.hasPermissionLevel(3))
+                ).then(literal("loadconf")//.requires(src-> src.hasPermissionLevel(3))
                         .executes((ctx->{
                             ctx.getSource().sendMessage(Text.literal("Loading(Force) Command maps from json...").setStyle(INFO));
                             CCmdMap=ConfigUtil.LoadConf();
@@ -245,10 +213,4 @@ public class ZjServerUtils implements ModInitializer {
         ));
         LogUtils.getLogger().info("Init done.");
     }
-
-    //ServerLifecycleEvents.ServerStopping.
-    //ServerStopCallback.EVENT;
-    //ServerStopping.register();
-    //ServerLifecycleEvents;
-    //ServerLifecycleEvents.SERVER_STOPPING.register();
 }
