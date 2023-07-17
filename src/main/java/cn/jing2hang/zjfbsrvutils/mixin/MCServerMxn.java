@@ -1,6 +1,9 @@
-package cn.jing2hang.zjfbsrvutils;
+package cn.jing2hang.zjfbsrvutils.mixin;
 
+import cn.jing2hang.zjfbsrvutils.ConfigUtil;
+import cn.jing2hang.zjfbsrvutils.ZjServerUtils;
 import cn.jing2hang.zjfbsrvutils.posyp.allpos;
+import com.mojang.logging.LogUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,10 +30,10 @@ public abstract class MCServerMxn {
 
     @Shadow public abstract void sendMessage(Text message);
     @Shadow
-    Thread serverThread;
+    private Thread serverThread;
     @Shadow
-    static
-    Logger LOGGER;
+    //static
+    private static final Logger LOGGER= LogUtils.getLogger();
 
     /**
      * Stop the server
@@ -38,9 +41,9 @@ public abstract class MCServerMxn {
      * @reason Need fork stop event but not found
      * //@param waitForShutdown block until shutdown
      */
-    @Inject(method="shutdown",at=@At("HEAD"))
+    @Inject(method="stop",at=@At("HEAD"))
     public void mixShutdown(CallbackInfo ci){
-        for(String UUIDs:ZjServerUtils.TspcPos.keySet()){
+        for(String UUIDs: ZjServerUtils.TspcPos.keySet()){
             ServerPlayerEntity pl=/*getPlayerFromUUID();*/this.getPlayerManager().getPlayer(UUIDs);
             if(pl==null)continue; // Offline Already?
             allpos p=ZjServerUtils.TspcPos.get(UUIDs);
