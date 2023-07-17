@@ -57,14 +57,5 @@ public abstract class MCServerMxn {
         LOGGER.info("Tp back spec players done.");
         ConfigUtil.writeConf(ZjServerUtils.CCmdMap);
         LOGGER.info("Saved custom commands.");
-        // Below Original Function
-        //this.running = false;
-        /*if (waitForShutdown) {
-            try {
-                this.serverThread.join();
-            } catch (InterruptedException var3) {
-                LOGGER.error("Error while shutting down", var3);
-            }
-        }*/
     }
 }

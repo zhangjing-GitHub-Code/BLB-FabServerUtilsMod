@@ -11,9 +11,6 @@ import static com.mojang.logging.LogUtils.getLogger;
 
 public class ConfigUtil {
     private static final Logger LOGGER=getLogger();
-    /*static HashMap<String,String> J2CMAP(JSONObject jo){
-        jo.
-    }*/
     static HashMap<String,String> LoadConf(){
         char cbuf[] = new char[10000];
         String cfpath="config//qcmd.json";
@@ -46,20 +43,7 @@ public class ConfigUtil {
         }
 
         String text = new String(cbuf, 0, len);
-            //1.构造一个json对象
-            //TypeReference<HashMap<String,String>> a=new TypeReference<HashMap<String,String>>();
             HashMap<String,String> nmap = JSONObject.parseObject(text.substring(text.indexOf("{")),new TypeReference<HashMap<String,String>>(){});   //过滤读出的utf-8前三个标签字节,从{开始读取
-            //2.通过getXXX(String key)方法获取对应的值
-            //System.out.println("FLAG:" + obj.getString("FLAG"));
-            //System.out.println("NAME:" + obj.getString("NAME"));
-
-            //获取数组
-            /*JSONArray arr = obj.getJSONArray("ARRAYS");
-            System.out.println("数组长度:" + arr.size());
-            for (int i = 0; i < arr.size(); i++) {
-                JSONObject subObj = arr.getJSONObject(i);
-                System.out.println("数组Name:" + subObj.getString("Name") + " String:" + subObj.getString("String"));
-            }*/
         LOGGER.info("Successful read conf"+cfpath+".");
         return nmap;
 
@@ -93,9 +77,6 @@ public class ConfigUtil {
         int len = 0;
         String text = JSON.toJSONString(im, JSONWriter.Feature.WriteMapNullValue);
         LOGGER.debug("Build json string: '"+text+"'.");
-        //1.构造一个json对象
-        //TypeReference<HashMap<String,String>> a=new TypeReference<HashMap<String,String>>();
-        //HashMap<String,String> nmap = JSONObject.parseObject(text.substring(text.indexOf("{")),new TypeReference<HashMap<String,String>>(){});   //过滤读出的utf-8前三个标签字节,从{开始读取
         try {
             confin.write(text);
             confin.close();
@@ -106,18 +87,5 @@ public class ConfigUtil {
         }
         LOGGER.info("Successfully saved conf '"+cfpath+"' !");
         return true;
-
-
-        //2.通过getXXX(String key)方法获取对应的值
-        //System.out.println("FLAG:" + obj.getString("FLAG"));
-        //System.out.println("NAME:" + obj.getString("NAME"));
-
-        //获取数组
-            /*JSONArray arr = obj.getJSONArray("ARRAYS");
-            System.out.println("数组长度:" + arr.size());
-            for (int i = 0; i < arr.size(); i++) {
-                JSONObject subObj = arr.getJSONObject(i);
-                System.out.println("数组Name:" + subObj.getString("Name") + " String:" + subObj.getString("String"));
-            }*/
     }
 }
